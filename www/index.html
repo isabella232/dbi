@@ -1,0 +1,68 @@
+<!doctype html>
+
+<title>DBI</title>
+<meta charset="utf-8"/>
+<link rel="stylesheet" href="cm-5.9/lib/codemirror.css" />
+<script src="cm-5.9/lib/codemirror.js"></script>
+<script src="cm-5.9/mode/sql/sql.js"></script>
+<link rel="stylesheet" href="cm-5.9/addon/hint/show-hint.css" />
+<script src="cm-5.9/addon/hint/show-hint.js"></script>
+<script src="cm-5.9/addon/hint/sql-hint.js"></script>
+<script src="index.js"></script>
+<script src="main.js"></script>
+<link rel="stylesheet" href="react-datagrid.css" />
+<style>
+.CodeMirror {
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+}
+
+    nav ul li {display: inline-block; padding-right: .5em;}
+        </style>
+<nav>
+  <a href="http://codemirror.net"><h1>DBI</h1><!--img id=logo src="/logo.png"--></a>
+
+  <ul>
+    <li><a href="../../index.html">Home</a>
+    <li><a href="../../doc/manual.html">Manual</a>
+    <li><a href="https://github.com/codemirror/codemirror">Code</a>
+    <li>Database: <select class="db-select" onselect="loadDBSchema (this)"></select></li>
+  </ul>
+</nav>
+
+<article>
+
+<!--form>
+<textarea id="code" name="code">-- SQL Mode for CodeMirror
+SELECT SQL_NO_CACHE DISTINCT
+    @var1 AS `val1`, @'val2', @global.'sql_mode',
+    1.1 AS `float_val`, .14 AS `another_float`, 0.09e3 AS `int_with_esp`,
+    0xFA5 AS `hex`, x'fa5' AS `hex2`, 0b101 AS `bin`, b'101' AS `bin2`,
+    DATE '1994-01-01' AS `sql_date`, { T "1994-01-01" } AS `odbc_date`,
+    'my string', _utf8'your string', N'her string',
+        TRUE, FALSE, UNKNOWN
+  FROM DUAL
+  -- space needed after '--'
+  # 1 line comment
+  /* multiline
+  comment! */
+  LIMIT 1 OFFSET 0;
+</textarea>
+            </form-->
+    <input type="button" onclick="runDBQuery(); return false;" />
+            <p><strong>MIME types defined:</strong>
+            <code><a href="?mime=text/x-sql">text/x-sql</a></code>,
+            <code><a href="?mime=text/x-mysql">text/x-mysql</a></code>,
+            <code><a href="?mime=text/x-mariadb">text/x-mariadb</a></code>,
+            <code><a href="?mime=text/x-cassandra">text/x-cassandra</a></code>,
+            <code><a href="?mime=text/x-plsql">text/x-plsql</a></code>,
+            <code><a href="?mime=text/x-mssql">text/x-mssql</a></code>,
+            <code><a href="?mime=text/x-hive">text/x-hive</a></code>.
+        </p>
+
+    <table id="data"></table>
+    <div id="grid">
+    </div>
+
+</article>
+

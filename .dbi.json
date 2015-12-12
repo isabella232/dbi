@@ -1,0 +1,35 @@
+{
+	"mysql": {
+		"driver": "mysql",
+		"database": "bookshelf_test",
+		"user": "bookshelf",
+		"password": "passbookword",
+		"encoding": "utf8"
+	},
+	"postgres": {
+		"driver": "postgres",
+		"database": "bookshelf_test",
+		"user": "apla"
+	},
+	"sqlite3": {
+		"driver": "sqlite",
+		"filename": ":memory:"
+	},
+	"mssql": {
+		"driver": "mssql",
+		"userName": "expressaccess",
+		"password": "2strongWa+er",
+		"server": "192.168.42.231",
+		"tunnel": {
+			"gatewayHost": "apla.me",
+			"gatewayUser": "apla",
+			"gatewayPrivateKey": "apla.me"
+		}
+	},
+	"oracle": {
+		"driver": "oracle",
+		"user": "oraxe",
+		"password": "2strongWa+er",
+		"connectString": "192.168.42.231:1521/XE"
+	}
+}
