@@ -7,7 +7,7 @@ var ResultsTable = require('./ResultsTable');
 var CodeMirror   = require('./CodeMirror');
 var RunButtons   = require('./RunButtons');
 
-function columnNames  (value) {return {name: value[0], title: value[0]}}
+function columnNames  (value) {return {name: value, title: value}}
 function columnValues (value) {return value[1]}
 
 var App = React.createClass ({
@@ -15,7 +15,6 @@ var App = React.createClass ({
 		var xhr = new XMLHttpRequest();
 
 		var selectEl = document.querySelector ('select.db-select');
-		// var tableEl  = document.querySelector ('table#data');
 
 		var grid = this.grid;
 
@@ -27,22 +26,15 @@ var App = React.createClass ({
 
 				var results = JSON.parse (xhr.response);
 
-				console.log (results);
+				//console.log (results);
 
 				var columns = [],
-					rows    = [];
-
-				// tableEl.innerHTML = '';
-
-				var first = true;
+					rows    = [],
+					first   = true;
 
 				results.forEach (function (row, idx) {
-					var values = [];
-					for (var k in row) {
-						values.push ([k, row[k]]);
-					}
 					if (first) {
-						columns = values.map (columnNames);
+						columns = Object.keys (row).map (columnNames);
 						first = false;
 					}
 					rows.push (row);
@@ -67,17 +59,8 @@ var App = React.createClass ({
 			sql = this.cm.editor.getValue ();
 		}
 
-		this.runDBQuery (sql);
-
 		// this is time to run some sql
-
-		console.log ('!!!', value, sql);
-
-		return;
-
-		this.setState({
-			value: value
-		});
+		this.runDBQuery (sql);
 	},
 	render: function () {
 
