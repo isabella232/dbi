@@ -1,0 +1,93 @@
+{
+	"debug": "<#false for production>",
+	"daemon": {
+		"http": {
+			"initiator": [
+				"http"
+			]
+		}
+	},
+	"cachePath": "var/cache",
+	"initiator": {
+		"token": {
+			"flows": {}
+		},
+		"http": {
+			"host": "<#default:127.0.0.1>",
+			"domain": "<#host.local>",
+			"port": "<#50100>",
+			"session": {
+				"secret": "<#please generate unique string>",
+				"cookieTemplate": {
+					"name": "session",
+					"domain": "<$initiator.http.domain>",
+					"path": "/",
+					"expirePeriod": "+172800000",
+					"httpOnly": true
+				}
+			},
+			"static": {
+				"root": "www",
+				"index": "index.html",
+				"headers": {}
+			},
+			"prepare": {
+				"post": {
+					"tasks": [
+						{
+							"$class": "post",
+							"request": "{$request}",
+							"$set": "request.body"
+						}
+					]
+				}
+			},
+			"flows": [{
+				"path": ""
+			}, {
+				"path": "connections",
+				"flows": [{
+					"path": "list",
+					"tasks":[{
+						"$errback": "listConnections",
+						"$set": "connections"
+					}],
+					"presenter": {
+						"type": "json",
+						"vars": "{$connections}",
+						"verbose": true
+					}
+				}, {
+					"pattern": "^(\\w+)$",
+					"tasks":[{
+						"$errback": "getDBInfo",
+						"$args": ["{$request.capture.0}"],
+						"$set": "dbInfo"
+					}],
+					"presenter": {
+						"type": "json",
+						"vars": "{$dbInfo}",
+						"verbose": true
+					},
+					"flows": [{
+						"path": "run-query",
+						"prepare": ["post"],
+						"tasks": [{
+							"fn": "console.log",
+							"$args": ["{$request.body}"]
+						}, {
+							"$errback": "runQuery",
+							"$args": ["{$request.capture.0}", "{$request.body.fields.query.0}"],
+							"$set": "results"
+						}],
+						"presenter": {
+							"type": "json",
+							"vars": "{$results}",
+							"verbose": true
+						}
+					}]
+				}]
+			}]
+		}
+	}
+}
