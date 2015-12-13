@@ -6,6 +6,7 @@ var ReactDOM = require ('react-dom');
 var ResultsTable = require('./ResultsTable');
 var CodeMirror   = require('./CodeMirror');
 var RunButtons   = require('./RunButtons');
+var DBConnection = require('./DBConnection');
 
 function columnNames  (value) {return {name: value, title: value}}
 function columnValues (value) {return value[1]}
@@ -14,13 +15,11 @@ var App = React.createClass ({
 	runDBQuery: function (sql) {
 		var xhr = new XMLHttpRequest();
 
-		var selectEl = document.querySelector ('select.db-select');
-
 		var grid = this.grid;
 
 		grid.setState ({loading: true});
 
-		xhr.open ("POST", "/connections/" + selectEl.value + "/run-query", true);
+		xhr.open ("POST", "/connections/" + this.connection + "/run-query", true);
 		xhr.onreadystatechange = function () {
 			if (xhr.readyState === 4) {
 
@@ -62,15 +61,48 @@ var App = React.createClass ({
 		// this is time to run some sql
 		this.runDBQuery (sql);
 	},
+	setConnection: function (connection) {
+		this.connection = connection;
+		this.buttons.setState ({connected: connection ? true : false});
+	},
+	setSelection: function (selection) {
+		if (this.cm.editor.somethingSelected ()) {
+			this.buttons.setState ({selection: true});
+		} else {
+			this.buttons.setState ({selection: false});
+		}
+	},
+	setSchema: function (tables) {
+		this.hintOptions.tables = tables;
+	},
 	render: function () {
+
+		this.hintOptions = {tables: {}};
 
 		var self = this;
 
 		return React.createElement ('div', {}, undefined, [
-			React.createElement (CodeMirror, {ref: function (_r) {self.cm = _r}}),
-			React.createElement (RunButtons, {onChange: this.clickHandler, ref: function (_r) {self.buttons = _r}}),
-			React.createElement (ResultsTable, {ref: function (_r) {self.grid = _r}})
+			React.createElement (DBConnection, {
+				key: "db-connection",
+				ref: function (_r) {self.database = _r},
+				onChange: function (connection) {self.setConnection (connection);},
+				onSchemaLoaded: this.setSchema
+			}),
+			React.createElement (CodeMirror, {
+				key: "codemirror",
+				ref: function (_r) {self.cm = _r},
+				onSelectionChange: this.setSelection,
+				hintOptions: this.hintOptions // no need to rerender component to update hintOptions
+			}),
+			React.createElement (RunButtons, {
+				key: "action-toolbar",
+				onChange: this.clickHandler, ref: function (_r) {self.buttons = _r}
+			}),
+			React.createElement (ResultsTable, {key: "results-table", ref: function (_r) {self.grid = _r}})
 		]);
+	},
+	componentDidMount: function () {
+		this.buttons.setState ({connected: false, selection: false});
 	}
 });
 

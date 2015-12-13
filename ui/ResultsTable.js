@@ -20,14 +20,14 @@ var ResultsTable = React.createClass({
 	},
 	render: function(){
 		// , width: 2000
-		return <DataGrid
-			idProperty='id'
-			dataSource={this.state.rows}
-			columns={this.state.columns}
-			loading={this.state.loading}
-			style={{height: 300}}
-			loadMaskOverHeader={true}
-		/>
+		return React.createElement(DataGrid, {
+			idProperty: 'id',
+			dataSource: this.state.rows,
+			columns: this.state.columns,
+			loading: this.state.loading,
+			style: { height: 300 },
+			loadMaskOverHeader: true
+		});
 	}
 })
 

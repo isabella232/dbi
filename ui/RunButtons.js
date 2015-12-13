@@ -4,7 +4,7 @@ var React    = require('react')
 
 var RunButtons = React.createClass({
 	propTypes: {
-		// value:      React.PropTypes.array,
+		connection: React.PropTypes.string,
 		onChange:   React.PropTypes.func
 	},
 	//getDefaultProps: function() {
@@ -12,6 +12,9 @@ var RunButtons = React.createClass({
 	//		value: ''
 	//	};
 	//},
+	getInitialState: function() {
+		return {selection: false, connected: false};
+	},
 	clickHandler: function(e) {
 		// console.log (e.target);
 		if (typeof this.props.onChange === 'function') {
@@ -24,8 +27,8 @@ var RunButtons = React.createClass({
 
 		return (
 		<div>
-			<input type="button" value="Run selection" onClick={this.clickHandler} />
-			<input type="button" value="Run all" onClick={this.clickHandler} />
+			<input type="button" value="Run selection" disabled={!(this.state.selection & this.state.connected)} onClick={this.clickHandler} />
+			<input type="button" value="Run all" disabled={!this.state.connected} onClick={this.clickHandler} />
 		</div>
 		);
 	}
