@@ -65,14 +65,17 @@ var App = React.createClass ({
 		this.connection = connection;
 		this.buttons.setState ({connected: connection ? true : false});
 	},
-	setSelection: function (selection) {
-		if (this.cm.editor.somethingSelected ()) {
-			this.buttons.setState ({selection: true});
-		} else {
-			this.buttons.setState ({selection: false});
-		}
+	setSelection: function (isSelected) {
+		this.buttons.setState ({selection: isSelected});
 	},
-	setSchema: function (tables) {
+	setSchema: function (schema) {
+
+		var tables = {};
+
+		for (var t in schema.tables) {
+			tables[t] = schema.tables[t].columns;
+		}
+
 		this.hintOptions.tables = tables;
 	},
 	render: function () {
@@ -84,7 +87,7 @@ var App = React.createClass ({
 		return React.createElement ('div', {}, undefined, [
 			React.createElement (DBConnection, {
 				key: "db-connection",
-				ref: function (_r) {self.database = _r},
+				ref: function (_r) {self.database = _r}, // use string and this.refs like here: https://www.codementor.io/reactjs/tutorial/how-to-build-a-sliding-menu-using-react-js-and-less-css
 				onChange: function (connection) {self.setConnection (connection);},
 				onSchemaLoaded: this.setSchema
 			}),
