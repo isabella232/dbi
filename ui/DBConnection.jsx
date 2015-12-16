@@ -47,10 +47,10 @@ var DBConnections = React.createClass({
 		};
 
 		// http://stackoverflow.com/questions/10272605/align-two-inline-blocks-left-and-right-on-same-line
-		return <div className="header" style={ {background: "#ccc", display: "flex", justifyContent: "space-between"} }>
-			<span>DBI</span>
-			<div className="nav">
-				<span style={{marginRight: "1em"}}>Connections:</span>
+		return <div className="header" style={ {background: "#3c3c3c", display: "flex", justifyContent: "space-between", padding: ".25em"} }>
+			<h1 style={{margin: "0", color: "#b5b5b5"}}>DBI</h1>
+			<div>
+				<span style={{marginRight: "1em", color: "#b5b5b5"}}>Connections:</span>
 				<div style={menuStyle}><Select
 					key="connection-select"
 					name="form-field-name"

@@ -7,8 +7,42 @@ var {ExpandableNavContainer, ExpandableNavbar, ExpandableNavHeader,
 	 ExpandableNavMenu, ExpandableNavMenuItem, ExpandableNavPage,
 	 ExpandableNavToggleButton} = ExpandableNav;
 
-var Navigation = React.createClass ({
+var NavHeader = React.createClass ({
+	propTypes: {
+		small: React.PropTypes.element,
+		full: React.PropTypes.element,
+		headerStyle: React.PropTypes.object,
+		smallStyle: React.PropTypes.object,
+		fullStyle: React.PropTypes.object,
+		smallClass: React.PropTypes.string,
+		fullClass: React.PropTypes.string,
+		onClick: React.PropTypes.func
+	},
+	getDefaultProps() {
+		return {
+			headerStyle: {
+				width: 100 + '%',
+				margin: 0
+			},
+		};
+	},
+	render: function () {
+		return <div className="expand-header-wrap" onClick={this.props.onClick}><ExpandableNavHeader
+			headerStyle={this.props.headerStyle}
+			small={this.props.small} full={this.props.full}
+			smallStyle={this.props.smallStyle} fullStyle={this.props.fullStyle}
+			smallClass={this.props.smallClass} fullClass={this.props.fullClass}
+		/></div>
+	}
+});
 
+var Navigation = React.createClass ({
+	getInitialState: function() {
+		return {expanded: false};
+	},
+	toggleExpand: function () {
+		this.refs.navContainer.handleToggle ();
+	},
 	render: function () {
 
 		this.hintOptions = {tables: {}};
@@ -33,15 +67,14 @@ var Navigation = React.createClass ({
 			page: {smallPadding: {padding: "0 0 0 60px"}, fullPadding: {padding: "0 0 0 240px"}}
 		};
 
-		return <ExpandableNavContainer>
+		return <ExpandableNavContainer ref="navContainer">
 			<ExpandableNavbar fullWidth={navStyles.navbar.fullWidth} smallWidth={navStyles.navbar.smallWidth}>
-			<ExpandableNavHeader small={<span className="logo">DBI</span>} full={<span>DBI</span>} />
+			<NavHeader onClick={this.toggleExpand} small={<span className="logo">☰</span>} full={<span>☰ Menu</span>} />
 			<ExpandableNavMenu>
 			<ExpandableNavMenuItem small={menuItems.sql.small} full={menuItems.sql.full} url={menuItems.sql.url} key={menuItems.sql.url} />
 			<ExpandableNavMenuItem small={menuItems.tables.small} full={menuItems.tables.full} url={menuItems.tables.url} key={menuItems.tables.url} />
 			</ExpandableNavMenu>
 			</ExpandableNavbar>
-			<ExpandableNavToggleButton small={<span>open</span>} full={<span>close</span>}/>
 			<ExpandableNavPage smallStyle={navStyles.page.smallPadding} fullStyle={navStyles.page.fullPadding}>
 			{this.props.children}
 			</ExpandableNavPage>
