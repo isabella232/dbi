@@ -8,13 +8,9 @@ var CodeMirror   = require('./CodeMirror');
 var RunButtons   = require('./RunButtons');
 var DBConnection = require('./DBConnection');
 var TopMenu      = require('./TopMenu');
+var Navigation   = require('./Navigation');
 
-var ExpandableNav = require('react-expandable-nav');
 
-// Or var ExpandableNavContainer = ExpandableNav.ExpandableNavContainer;
-var {ExpandableNavContainer, ExpandableNavbar, ExpandableNavHeader,
-	 ExpandableNavMenu, ExpandableNavMenuItem, ExpandableNavPage,
-	 ExpandableNavToggleButton} = ExpandableNav;
 
 function columnNames  (value) {return {name: value, title: value}}
 function columnValues (value) {return value[1]}
@@ -93,43 +89,30 @@ var App = React.createClass ({
 		var self = this;
 
 		var menuItems = {
-			small: [<span className="glyphicon glyphicon-home">SQL</span>,
-					<span className="glyphicon glyphicon-user">Schema</span>],
-			full: [<span>SQL</span>, <span>Schema</span>,
-					<span>Contact us</span>]
-				   };
+			sql: {
+				small: <span className="glyphicon glyphicon-home">SQL</span>,
+				full: <span>SQL</span>,
+				url: '/'
+			},
+			tables: {
+				small: <span className="glyphicon glyphicon-user">▦</span>,
+				full: <span className="glyphicon glyphicon-user">Schema</span>,
+				url: '/tables'
+			}
+	   };
 
 		var navStyles = {
 			navbar: {smallWidth: 60, fullWidth: 240},
-			page: {smallPadding: {padding: "0 0 0 60px"}}
+			page: {smallPadding: {padding: "0 0 0 60px"}, fullPadding: {padding: "0 0 0 240px"}}
 		};
 
-		return React.createElement ('div', {}, undefined, [
-			<ExpandableNavContainer>
-				<ExpandableNavbar fullWidth={navStyles.navbar.fullWidth} smallWidth={navStyles.navbar.smallWidth}>
-					<ExpandableNavHeader small={<span className="logo">DBI</span>} full={<span>DBI</span>} />
-					<ExpandableNavMenu>
-						<ExpandableNavMenuItem small={menuItems.small[0]} full={menuItems.full[0]} url='/home/' />
-						<ExpandableNavMenuItem small={menuItems.small[1]} full={menuItems.full[1]} url='/about/' />
-					</ExpandableNavMenu>
-				</ExpandableNavbar>
-				<ExpandableNavToggleButton small={<span>open</span>} full={<span>close</span>}/>
-				<ExpandableNavPage smallStyle={navStyles.page.smallPadding}>
-					<div>
-						<DBConnection ref="database" onChange={this.setConnection} onSchemaLoaded={this.setSchema}  key="db-connection" />
-					</div>
-					<CodeMirror ref="cm" onSelectionChange={this.setSelection} hintOptions={this.hintOptions} key="codemirror" />
-					<RunButtons ref="buttons" onChange={this.clickHandler} key="action-toolbar" />
-					<ResultsTable ref="grid" key="results-table" />
-				</ExpandableNavPage>
-			</ExpandableNavContainer>
+		return <Navigation>
+			<DBConnection ref="database" maxWidth="300" onChange={this.setConnection} onSchemaLoaded={this.setSchema}  key="db-connection" />
+			<CodeMirror ref="cm" onSelectionChange={this.setSelection} hintOptions={this.hintOptions} key="codemirror" />
+			<RunButtons ref="buttons" onChange={this.clickHandler} key="action-toolbar" />
+			<ResultsTable ref="grid" key="results-table" />
+		</Navigation>
 
-//			React.createElement (TopMenu, {
-//				key: "top-menu",
-//				ref: "top-menu", // use string and this.refs like here: https://www.codementor.io/reactjs/tutorial/how-to-build-a-sliding-menu-using-react-js-and-less-css
-//			}),
-
-		]);
 	},
 	componentDidMount: function () {
 		this.refs.buttons.setState ({connected: false, selection: false});
