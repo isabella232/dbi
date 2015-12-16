@@ -24,15 +24,22 @@ var ResultsTable = React.createClass({
 		this.setState (state);
 	},
 	onSelectionChange: function (newSelection) {
+
 		selection = newSelection;
-		console.log (selection);
+
+		var clipInput = this.refs.clipboardSource;
+		clipInput.value = JSON.stringify (newSelection);
+		clipInput.select();
+		clipInput.focus();
+
 		this.setState ({});
 	},
 	render: function(){
 		// , width: 2000
 		return React.createElement('div', {}, undefined, [
 			React.createElement('input', {
-				style: {position: 'absolute', visibility: 'hidden'},
+				readOnly: true,
+				style: {position: 'absolute', zIndex: -1, top: -100, left: -100},
 				ref: 'clipboardSource',
 				key: 'clipboard-source'
 			}),
@@ -41,10 +48,12 @@ var ResultsTable = React.createClass({
 				dataSource: this.state.rows,
 				columns: this.state.columns,
 				loading: this.state.loading,
+				withColumnMenu: false,
+				columnMinWidth: 100,
 				style: { height: 300 },
 				loadMaskOverHeader: true,
 				emptyText: 'No records',
-				selection: selection,
+				selected: selection,
 				onSelectionChange: this.onSelectionChange,
 				key: 'data-grid'
 			})

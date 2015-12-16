@@ -4,11 +4,11 @@ var React = require ('react');
 var ReactDOM = require ('react-dom');
 
 var ResultsTable = require('./ResultsTable');
+
 var CodeMirror   = require('./CodeMirror');
 var RunButtons   = require('./RunButtons');
-var DBConnection = require('./DBConnection');
-var TopMenu      = require('./TopMenu');
-var Navigation   = require('./Navigation');
+var TopBar       = require('./TopBar');
+var Navigation   = require('./SideBar');
 
 
 
@@ -107,7 +107,7 @@ var App = React.createClass ({
 		};
 
 		return <Navigation>
-			<DBConnection ref="database" maxWidth="300" onChange={this.setConnection} onSchemaLoaded={this.setSchema}  key="db-connection" />
+			<TopBar ref="database" maxWidth="300" onChange={this.setConnection} onSchemaLoaded={this.setSchema}  key="db-connection" />
 			<CodeMirror ref="cm" onSelectionChange={this.setSelection} hintOptions={this.hintOptions} key="codemirror" />
 			<RunButtons ref="buttons" onChange={this.clickHandler} key="action-toolbar" />
 			<ResultsTable ref="grid" key="results-table" />
