@@ -43,6 +43,7 @@ var CodeMirrorR = React.createClass({
 			lineNumbers: true,
 			matchBrackets : true,
 			autofocus: true,
+			//theme: "zenburn",
 			// extraKeys: {"Ctrl-Space": "autocomplete"},
 			hintOptions: hintOptions
 		});
