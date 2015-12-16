@@ -47,7 +47,7 @@ var App = React.createClass ({
 					rows.push (row);
 				});
 
-				grid.setState ({columns: columns, rows: rows, loading: false});
+				grid.setData ({columns: columns, rows: rows, loading: false});
 
 			}
 		};
