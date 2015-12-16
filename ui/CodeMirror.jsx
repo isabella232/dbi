@@ -9,16 +9,7 @@ var CodeMirrorR = React.createClass({
 		hintOptions:   React.PropTypes.object
 	},
 	render: function(){
-		var self = this;
-		return React.createElement(
-			'textarea',
-			{id: 'code', name: 'code', ref: function (_ref) {
-				return self.editorEl = _ref;
-			}},
-			"-- SQL Mode for CodeMirror\nselect * from authors;"
-		);
-		//return (<textarea id="code" name="code" ref={(ref) => this.editorEl = ref}>-- SQL Mode for CodeMirror
-//select * from article;</textarea>);
+		return <textarea id="code" name="code" ref="cm" defaultValue="select * from authors;" />
 	},
 	componentDidMount: function () {
 
@@ -43,7 +34,7 @@ var CodeMirrorR = React.createClass({
 			countries: {name: null, population: null, size: null}
 		}};
 
-		var EditorInstance = CodeMirror.fromTextArea(this.editorEl, {
+		var EditorInstance = CodeMirror.fromTextArea(this.refs.cm, {
 			mode: mime,
 			// indentWithTabs: true,
 			tabSize: 4,
