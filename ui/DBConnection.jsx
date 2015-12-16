@@ -36,43 +36,35 @@ var DBConnections = React.createClass({
 			openKeys: [],
 		};
 	},
-	emptyOpenKeys() {
-		this.setState({
-			openKeys: [],
-		});
-	},
-
-	syncOpenKeys(e) {
-		this.setState({
-			openKeys: e.openKeys,
-		});
-	},
 	render: function(){
-
-		// onclick="runDBQuery(); return false;"
-
 		var self = this;
 
+		var menuStyle = {
+			display: 'inline-block',
+			maxWidth: this.props.maxWidth,
+			width: this.props.maxWidth,
+			verticalAlign: 'middle'
+		};
 
-		return React.createElement ('div', {}, undefined, [
-			React.createElement (Select, {
-				key: "connection-select",
-				name: "form-field-name",
-				value: this.state.value,
-				clearable: false,
-				searchable: false,
-				style: {width: 300},
-				options: this.state.options,
-				onChange: this.setConnection,
-				isLoading: this.state.loading,
-				ref: function (_r) {self.select = _r}
-			}),
-			React.createElement ('button', {
-				disabled: !this.state.schema,
-				key: "schema-key",
-				value: 'schema'
-			})
-			]);
+		// http://stackoverflow.com/questions/10272605/align-two-inline-blocks-left-and-right-on-same-line
+		return <div className="header" style={ {background: "#ccc", display: "flex", justifyContent: "space-between"} }>
+			<span>DBI</span>
+			<div className="nav">
+				<span style={{marginRight: "1em"}}>Connections:</span>
+				<div style={menuStyle}><Select
+					key="connection-select"
+					name="form-field-name"
+					value={this.state.value}
+					clearable={false}
+					searchable={false}
+					options={this.state.options}
+					onChange={this.setConnection}
+					isLoading={this.state.loading}
+					ref="select" />
+				</div>
+			</div>
+		</div>;
+
 	},
 	setConnection: function (connName) {
 		var xhr = new XMLHttpRequest();
@@ -102,7 +94,7 @@ var DBConnections = React.createClass({
 	componentDidMount: function () {
 		var xhr = new XMLHttpRequest();
 
-		var select = this.select;
+		var select = this.refs.select;
 
 		xhr.open ("GET", "/connections/list", true);
 		xhr.onreadystatechange = function () {
@@ -130,9 +122,6 @@ var DBConnections = React.createClass({
 
 				this.setConnection (value);
 
-				// TODO: loadDBSchema (selectEl);
-
-				// TODO: allow select
 			}
 		}.bind (this);
 
