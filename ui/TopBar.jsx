@@ -9,15 +9,6 @@ var options = [
 //	{ value: 'two', label: 'Two' }
 ];
 
-function logChange(val) {
-	console.log("Selected: " + val);
-}
-
-function handleSelect(info) {
-	console.log(info);
-	console.log('selected ' + info.key);
-}
-
 var DBConnections = React.createClass({
 	propTypes: {
 		// value:      React.PropTypes.array,
@@ -79,6 +70,11 @@ var DBConnections = React.createClass({
 
 				this.setState ({schema: true, loading: false, value: connName});
 
+				if (connName !== this.props.params.database)
+					this.props.history.push ({
+						pathname: connName
+					});
+
 				if (this.props.onSchemaLoaded)
 					this.props.onSchemaLoaded (schema);
 			}
@@ -92,6 +88,9 @@ var DBConnections = React.createClass({
 
 	},
 	componentDidMount: function () {
+
+		console.log (this.props.history);
+
 		var xhr = new XMLHttpRequest();
 
 		var select = this.refs.select;
@@ -102,20 +101,20 @@ var DBConnections = React.createClass({
 
 				var connections = JSON.parse (xhr.response);
 
-				var first = true;
-
 				var options = [],
-					selected,
+					selected = this.props.params.database,
 					value;
 
 				for (var connName in connections) {
-					if (first && !selected) {
+					if (selected && selected === connName) {
 						value = connName;
 						// renderFlow ('.diagram', useCases.tests[useCaseName]);
 					}
-					first = false;
 					options.push ({value: connName, label: connName});
-					// selectEl.innerHTML += '<option value="' + connName + '">' + connName + '</option>';
+				}
+
+				if (!value) {
+					value = options[0].value;
 				}
 
 				this.setState ({loading: false, options: options, value: value});

@@ -43,6 +43,12 @@
 				}
 			},
 			"flows": [{
+				"code": 404,
+				"presenter": {
+					"type": "fileasis",
+					"file": "{$project.root.path}/www/index.html"
+				}
+			}, {
 				"path": ""
 			}, {
 				"path": "connections",

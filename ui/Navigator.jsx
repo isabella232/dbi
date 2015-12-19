@@ -2,6 +2,8 @@ var React = require ('react');
 
 var ExpandableNav = require('react-expandable-nav');
 
+var TopBar        = require('./TopBar');
+
 // Or var ExpandableNavContainer = ExpandableNav.ExpandableNavContainer;
 var {ExpandableNavContainer, ExpandableNavbar, ExpandableNavHeader,
 	 ExpandableNavMenu, ExpandableNavMenuItem, ExpandableNavPage,
@@ -36,6 +38,53 @@ var NavHeader = React.createClass ({
 	}
 });
 
+function isLeftClickEvent(event) {
+	return event.button === 0;
+}
+
+function isModifiedEvent(event) {
+	return !!(event.metaKey || event.altKey || event.ctrlKey || event.shiftKey);
+}
+
+var NavLink = React.createClass ({
+	onClick: function (event) {
+
+		// ExpandableNav and Router/Link don't play nice
+
+		var allowTransition = true;
+
+		if (this.props.onClick) this.props.onClick(event);
+
+		if (isModifiedEvent(event) || !isLeftClickEvent(event)) return;
+
+		if (event.defaultPrevented === true) allowTransition = false;
+
+		// If target prop is set (e.g. to "_blank") let browser handle link.
+		if (this.props.target) {
+			if (!allowTransition) event.preventDefault();
+
+			return;
+		}
+
+		event.preventDefault();
+
+		if (allowTransition) {
+			this.props.history.pushState (null, this.props.menuItem.url);
+		}
+
+	},
+	render: function () {
+		return <ExpandableNavMenuItem
+			small={this.props.menuItem.small}
+			full={this.props.menuItem.full}
+			url={this.props.menuItem.url}
+			key={this.props.menuItem.url}
+			onClick={this.onClick}
+			onSelect={this.props.onSelect}
+		/>
+	}
+});
+
 var Navigation = React.createClass ({
 	getInitialState: function() {
 		return {expanded: false};
@@ -53,12 +102,12 @@ var Navigation = React.createClass ({
 			sql: {
 				small: <span className="glyphicon glyphicon-home">SQL</span>,
 				full: <span>SQL</span>,
-				url: '/'
+				url: ['', this.props.params.database, 'sql'].join('/')
 			},
-			tables: {
+			inspect: {
 				small: <span className="glyphicon glyphicon-user">▦</span>,
 				full: <span className="glyphicon glyphicon-user">Schema</span>,
-				url: '/tables'
+				url: ['', this.props.params.database, 'inspect'].join('/')
 			}
 		};
 
@@ -71,12 +120,13 @@ var Navigation = React.createClass ({
 			<ExpandableNavbar fullWidth={navStyles.navbar.fullWidth} smallWidth={navStyles.navbar.smallWidth}>
 			<NavHeader onClick={this.toggleExpand} small={<span className="logo">☰</span>} full={<span>☰ Menu</span>} />
 			<ExpandableNavMenu>
-			<ExpandableNavMenuItem small={menuItems.sql.small} full={menuItems.sql.full} url={menuItems.sql.url} key={menuItems.sql.url} />
-			<ExpandableNavMenuItem small={menuItems.tables.small} full={menuItems.tables.full} url={menuItems.tables.url} key={menuItems.tables.url} />
+				<NavLink menuItem={menuItems.sql} history={this.props.history} />
+				<NavLink menuItem={menuItems.inspect} history={this.props.history} />
 			</ExpandableNavMenu>
 			</ExpandableNavbar>
 			<ExpandableNavPage smallStyle={navStyles.page.smallPadding} fullStyle={navStyles.page.fullPadding}>
-			{this.props.children}
+				<TopBar ref="database" maxWidth="300" history={this.props.history} params={this.props.params} key="db-connection" />
+				{this.props.children}
 			</ExpandableNavPage>
 			</ExpandableNavContainer>
 
