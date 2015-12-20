@@ -73,13 +73,24 @@ var SQLEditor = React.createClass ({
 
 		this.hintOptions.tables = tables;
 	},
+	onEditorEvent: function (evt) {
+		console.log (evt.type, evt.value);
+		if (evt.type === "EXECUTE_SQL") {
+			this.runDBQuery (evt.value);
+		}
+	},
 	render: function () {
 
 		this.hintOptions = {tables: {}};
 
 		// TODO: add split control between codemirror and resultstable
 		return <div>
-			<CodeMirror ref="cm" onSelectionChange={this.setSelection} hintOptions={this.hintOptions} key="cm" />
+			<CodeMirror ref="cm"
+				onSelectionChange={this.setSelection}
+				onEvent={this.onEditorEvent}
+				hintOptions={this.hintOptions}
+				key="cm"
+			/>
 			<RunButtons ref="buttons" onChange={this.clickHandler} key="rb" />
 			<ResultsTable ref="grid" key="rt" />
 		</div>

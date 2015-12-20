@@ -27,8 +27,12 @@ var RunButtons = React.createClass({
 
 		return (
 		<div>
-			<input type="button" value="Run selection" disabled={!(this.state.selection & this.state.connected)} onClick={this.clickHandler} />
-			<input type="button" value="Run all" disabled={!this.state.connected} onClick={this.clickHandler} />
+			<button type="button" value="Run selection" disabled={!(this.state.selection & this.state.connected)} onClick={this.clickHandler} >
+				Execute <kbd>ctrl</kbd> + <kbd>⏎</kbd>
+			</button>
+			<button type="button" value="Run all" disabled={!this.state.connected} onClick={this.clickHandler} >
+				Execute All <kbd>ctrl</kbd> + <kbd>alt</kbd> + <kbd>⏎</kbd>
+			</button>
 		</div>
 		);
 	}

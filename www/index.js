@@ -4,28 +4,28 @@ document.addEventListener ('DOMContentLoaded', function () {
 
 function getSelectedRange() {
 	return {
-		from: editor.getCursor(true),
-		to: editor.getCursor(false)
+		from: cm.getCursor(true),
+		to: cm.getCursor(false)
 	};
 }
 
 function autoFormatSelection() {
 	var range = getSelectedRange();
-	editor.autoFormatRange (range.from, range.to);
+	cm.autoFormatRange (range.from, range.to);
 }
 
 function indentAll () {
 	var lineCount = editor.lineCount();
 	for(var line = 0; line < lineCount; line++) {
-		editor.indentLine(line, "smart");
+		cm.indentLine(line, "smart");
 	}
 }
 
 CodeMirror.extendMode("sql", {
 	// FIXME semicolons inside of for
 	newlineAfterToken: function(_type, content, textAfter, state) {
-		console.log (_type, content, textAfter, state);
-		if (_type === null && content === ',') return true;
+		console.log (_type, content, (_type === null && content === ','), textAfter, state);
+		if (_type === null && (content === ',')) return true;
 		return false;
 		/*if (this.jsonMode) {
 			return /^[\[,{]$/.test(content) || /^}/.test(textAfter);
@@ -34,6 +34,58 @@ CodeMirror.extendMode("sql", {
 			return /^[;{}]$/.test(content) && !/^;/.test(textAfter);
 		}*/
 	}
+});
+
+var QUERY_DIV = ';';
+var Pos = CodeMirror.Pos;
+
+function convertCurToNumber(cur) {
+	// max characters of a line is 999,999.
+	return cur.line + cur.ch / Math.pow(10, 6);
+}
+
+function convertNumberToCur(num) {
+	return Pos(Math.floor(num), +num.toString().split('.').pop());
+}
+
+// Applies automatic formatting to the specified range
+CodeMirror.defineExtension("currentSQLStatement", function () {
+	var editor = this;
+
+	var doc = editor.doc;
+	var fullQuery = doc.getValue();
+	var previousWord = "";
+	var table = "";
+	var separator = [];
+	var validRange = {
+		start: Pos(0, 0),
+		end: Pos(editor.lastLine(), editor.getLineHandle(editor.lastLine()).length)
+	};
+
+	//add separator
+	var indexOfSeparator = fullQuery.indexOf(QUERY_DIV);
+	while(indexOfSeparator != -1) {
+		separator.push(doc.posFromIndex(indexOfSeparator));
+		indexOfSeparator = fullQuery.indexOf(QUERY_DIV, indexOfSeparator+1);
+	}
+	separator.unshift(Pos(0, 0));
+	separator.push(Pos(editor.lastLine(), editor.getLineHandle(editor.lastLine()).text.length));
+
+	//find valid range
+	var prevItem = 0;
+	var current = convertCurToNumber(editor.getCursor());
+	for (var i=0; i< separator.length; i++) {
+		var _v = convertCurToNumber(separator[i]);
+		if (current > prevItem && current <= _v) {
+			validRange = { start: convertNumberToCur(prevItem), end: convertNumberToCur(_v) };
+			break;
+		}
+		prevItem = _v;
+	}
+
+	var query = doc.getRange(validRange.start, validRange.end, false);
+
+	return query;
 });
 
 // Applies automatic formatting to the specified range

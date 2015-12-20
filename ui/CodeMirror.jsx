@@ -7,8 +7,11 @@ var CodeMirrorR = React.createClass({
 		onSelectionChange:   React.PropTypes.func,
 		hintOptions:   React.PropTypes.object
 	},
+	getInitialState: function () {
+		return {value: "select * from authors;"}
+	},
 	render: function(){
-		return <textarea id="code" name="code" ref="cm" defaultValue="select * from authors;" />
+		return <div id="code" name="code" ref="cm" ></div>
 	},
 	componentDidMount: function () {
 
@@ -20,6 +23,17 @@ var CodeMirrorR = React.createClass({
 		//<code><a href="?mime=text/x-plsql">text/x-plsql</a></code>,
 		//<code><a href="?mime=text/x-mssql">text/x-mssql</a></code>,
 		//<code><a href="?mime=text/x-hive">text/x-hive</a></code>.
+
+		// read last id in localstorage
+		// TODO: check if localStorage accessible
+		var lastItemId = localStorage.getItem ('sql-editor-last-id'),
+			lastItemContents;
+
+		if (lastItemId)
+			lastItemContents = localStorage.getItem (lastItemId);
+
+		if (lastItemContents)
+			this.setState ({value: lastItemContents});
 
 		var mime = 'text/x-mariadb';
 		// get mime type
@@ -33,17 +47,35 @@ var CodeMirrorR = React.createClass({
 			countries: {name: null, population: null, size: null}
 		}};
 
-		var EditorInstance = CodeMirror.fromTextArea(this.refs.cm, {
+		var self = this;
+		var isSelected = false;
+
+		var EditorInstance = CodeMirror (this.refs.cm, {
 			mode: mime,
-			// indentWithTabs: true,
+			value: lastItemContents,
+			indentWithTabs: true,
+			//indentWithTabs: false,
 			tabSize: 4,
-			indentWithTabs: false,
 			smartIndent: true,
 			lineNumbers: true,
 			matchBrackets : true,
 			autofocus: true,
 			//theme: "zenburn",
 			// extraKeys: {"Ctrl-Space": "autocomplete"},
+			extraKeys: {
+				"Ctrl-Enter": function (instance) {
+					if (self.props.onEvent) {
+						var sql = isSelected ? instance.getSelection() : instance.currentSQLStatement();
+						self.props.onEvent ({
+							type: "EXECUTE_SQL",
+							value: sql
+						});
+					}
+					// console.log (instance.currentSQLStatement());
+					// console.log ("Control+Enter");
+					return false;
+				},
+			},
 			hintOptions: hintOptions
 		});
 
@@ -74,6 +106,9 @@ var CodeMirrorR = React.createClass({
 
 		// taken from there: http://stackoverflow.com/questions/13744176/codemirror-autocomplete-after-any-keyup
 		EditorInstance.on ("keyup", function(editor, event) {
+
+			// console.log ('XXX', event);
+
 			var __Cursor = editor.getDoc().getCursor();
 			var __Token = editor.getTokenAt(__Cursor);
 
@@ -101,13 +136,25 @@ var CodeMirrorR = React.createClass({
 			});
 		});
 
+		EditorInstance.on ("changes", function (cm, changes) {
+			// TODO: can be slow, use doc.replaceRange
+
+			// TODO: calc last editor id, for now it is 0
+
+			localStorage.setItem ('sql-editor-last-id', 'sql-editor-0'),
+			localStorage.setItem ('sql-editor-0', cm.getValue ());
+
+			// this.setState ({value: lastItemContents});
+		});
+
 		EditorInstance.on ("beforeSelectionChange", function (cm, obj) {
 			//console.log (obj.ranges, obj.update(obj.ranges));
 
-			var isSelected = false,
-				range = obj.ranges[0];
+			var range = obj.ranges[0];
 			if ((range.anchor.line !== range.head.line) || (range.anchor.ch !== range.head.ch)) {
 				isSelected = true;
+			} else {
+				isSelected = false;
 			}
 
 			if (this.props.onSelectionChange) {
@@ -115,7 +162,7 @@ var CodeMirrorR = React.createClass({
 			}
 		}.bind (this));
 
-		this.editor = EditorInstance;
+		this.editor = window.cm = EditorInstance;
 
 		this.hintOptions = hintOptions;
 	}
