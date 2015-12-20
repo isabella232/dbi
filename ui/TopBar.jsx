@@ -75,6 +75,9 @@ var DBConnections = React.createClass({
 						pathname: connName
 					});
 
+				// TODO: use dispatcher
+				window.hintOptions.tables = schema.tables;
+
 				if (this.props.onSchemaLoaded)
 					this.props.onSchemaLoaded (schema);
 			}
