@@ -16,9 +16,10 @@ var RunButtons = React.createClass({
 		return {selection: false, connected: false};
 	},
 	clickHandler: function(e) {
-		// console.log (e.target);
+		// react render span elements within button tag
+		var target = e.target.nodeName === 'button' ? e.target : e.target.parentNode;
 		if (typeof this.props.onChange === 'function') {
-			this.props.onChange(e.target.value);
+			this.props.onChange(target.value);
 		}
 	},
 	render: function(){
@@ -27,11 +28,11 @@ var RunButtons = React.createClass({
 
 		return (
 		<div>
-			<button type="button" value="Run selection" disabled={!(this.state.selection & this.state.connected)} onClick={this.clickHandler} >
-				Execute <kbd>ctrl</kbd> + <kbd>⏎</kbd>
+			<button type="button" value={this.state.selection ? "selection" : "statement"} disabled={!this.state.connected} onClick={this.clickHandler} >
+				Execute {this.state.selection ? "selection" : "statement"} <kbd>ctrl</kbd> + <kbd>⏎</kbd>
 			</button>
-			<button type="button" value="Run all" disabled={!this.state.connected} onClick={this.clickHandler} >
-				Execute All <kbd>ctrl</kbd> + <kbd>alt</kbd> + <kbd>⏎</kbd>
+			<button type="button" value="all" disabled={!this.state.connected} onClick={this.clickHandler} >
+				Execute all <kbd>ctrl</kbd> + <kbd>alt</kbd> + <kbd>⏎</kbd>
 			</button>
 		</div>
 		);

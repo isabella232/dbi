@@ -51,14 +51,22 @@ var SQLEditor = React.createClass ({
 
 		var sql;
 
-		if (value === "Run selection") {
+		if (value === "selection") {
 			sql = this.refs.cm.editor.getSelection ();
-		} else if (value === "Run all") {
+		} else if (value === "statement") {
+			sql = this.refs.cm.editor.currentSQLStatement ();
+		} else if (value === "all") {
 			sql = this.refs.cm.editor.getValue ();
 		}
 
 		// this is time to run some sql
 		this.runDBQuery (sql);
+	},
+	onEditorEvent: function (evt) {
+		console.log (evt.type, evt.value);
+		if (evt.type === "EXECUTE_SQL") {
+			this.runDBQuery (evt.value);
+		}
 	},
 	setSelection: function (isSelected) {
 		this.refs.buttons.setState ({selection: isSelected});
@@ -72,12 +80,6 @@ var SQLEditor = React.createClass ({
 		}
 
 		this.hintOptions.tables = tables;
-	},
-	onEditorEvent: function (evt) {
-		console.log (evt.type, evt.value);
-		if (evt.type === "EXECUTE_SQL") {
-			this.runDBQuery (evt.value);
-		}
 	},
 	render: function () {
 

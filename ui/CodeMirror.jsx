@@ -66,13 +66,15 @@ var CodeMirrorR = React.createClass({
 				"Ctrl-Enter": function (instance) {
 					if (self.props.onEvent) {
 						var sql = isSelected ? instance.getSelection() : instance.currentSQLStatement();
-						self.props.onEvent ({
-							type: "EXECUTE_SQL",
-							value: sql
-						});
+						self.props.onEvent ({type: "EXECUTE_SQL", value: sql});
 					}
-					// console.log (instance.currentSQLStatement());
-					// console.log ("Control+Enter");
+					return false;
+				},
+				"Ctrl+Alt+Enter": function (instance) {
+					if (self.props.onEvent) {
+						var sql = instance.getValue();
+						self.props.onEvent ({type: "EXECUTE_SQL", value: sql});
+					}
 					return false;
 				},
 			},

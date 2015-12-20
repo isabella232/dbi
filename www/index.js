@@ -36,17 +36,38 @@ CodeMirror.extendMode("sql", {
 	}
 });
 
+// Maps a position in a case-folded line back to a position in the original line
+// (compensating for codepoints increasing in number during folding)
+function adjustPos(orig, folded, pos) {
+	if (orig.length == folded.length) return pos;
+	for (var pos1 = Math.min(pos, orig.length);;) {
+		var len1 = orig.slice(0, pos1).toLowerCase().length;
+		if (len1 < pos) ++pos1;
+		else if (len1 > pos) --pos1;
+		else return pos1;
+	}
+}
+
 var QUERY_DIV = ';';
 var Pos = CodeMirror.Pos;
 
-function convertCurToNumber(cur) {
-	// max characters of a line is 999,999.
-	return cur.line + cur.ch / Math.pow(10, 6);
-}
-
-function convertNumberToCur(num) {
-	return Pos(Math.floor(num), +num.toString().split('.').pop());
-}
+function findMatch (doc, query, reverse, pos) {
+	if (reverse) {
+		var orig = doc.getLine(pos.line).slice(0, pos.ch), line = orig;
+		var match = line.lastIndexOf(query);
+		if (match > -1) {
+			match = adjustPos(orig, line, match);
+			return Pos(pos.line, match + query.length);
+		}
+	} else {
+		var orig = doc.getLine(pos.line).slice(pos.ch), line = orig;
+		var match = line.indexOf(query);
+		if (match > -1) {
+			match = adjustPos(orig, line, match) + pos.ch;
+			return Pos(pos.line, match);
+		}
+	}
+};
 
 // Applies automatic formatting to the specified range
 CodeMirror.defineExtension("currentSQLStatement", function () {
@@ -54,38 +75,39 @@ CodeMirror.defineExtension("currentSQLStatement", function () {
 
 	var doc = editor.doc;
 	var fullQuery = doc.getValue();
-	var previousWord = "";
-	var table = "";
-	var separator = [];
-	var validRange = {
-		start: Pos(0, 0),
-		end: Pos(editor.lastLine(), editor.getLineHandle(editor.lastLine()).length)
-	};
 
-	//add separator
-	var indexOfSeparator = fullQuery.indexOf(QUERY_DIV);
-	while(indexOfSeparator != -1) {
-		separator.push(doc.posFromIndex(indexOfSeparator));
-		indexOfSeparator = fullQuery.indexOf(QUERY_DIV, indexOfSeparator+1);
-	}
-	separator.unshift(Pos(0, 0));
-	separator.push(Pos(editor.lastLine(), editor.getLineHandle(editor.lastLine()).text.length));
+	var cursor = editor.getCursor();
+	var query = ';';
 
-	//find valid range
-	var prevItem = 0;
-	var current = convertCurToNumber(editor.getCursor());
-	for (var i=0; i< separator.length; i++) {
-		var _v = convertCurToNumber(separator[i]);
-		if (current > prevItem && current <= _v) {
-			validRange = { start: convertNumberToCur(prevItem), end: convertNumberToCur(_v) };
+	// search for a previous sql statement
+	var start = Pos (0, 0),
+		end   = Pos (editor.lastLine(), editor.getLineHandle(editor.lastLine()).length),
+		pos   = cursor;
+
+	for (;;) {
+		var m = findMatch (doc, query, true, pos);
+		if (m) {
+			start = m;
 			break;
 		}
-		prevItem = _v;
+		if (!pos.line) break;
+		pos = Pos(pos.line-1, this.doc.getLine(pos.line-1).length);
 	}
 
-	var query = doc.getRange(validRange.start, validRange.end, false);
+	pos = cursor;
+	for (;;) {
+		var m = findMatch (doc, query, false, pos);
+		if (m) {
+			end = m;
+			break;
+		}
+		var maxLine = this.doc.lineCount();
+		if (pos.line == maxLine - 1) break;
+		pos = Pos(pos.line + 1, 0);
+	}
 
-	return query;
+	return doc.getRange (start, end, false).join ("\n")
+
 });
 
 // Applies automatic formatting to the specified range
