@@ -17,7 +17,8 @@ var ResultsTable = React.createClass({
 		return {
 			rows:    data,
 			columns: columns,
-			loading: false
+			loading: false,
+			error: null
 		};
 	},
 	setData: function (state) {
@@ -52,7 +53,8 @@ var ResultsTable = React.createClass({
 				columnMinWidth: 100,
 				style: { height: 300 },
 				loadMaskOverHeader: true,
-				emptyText: 'No records',
+				emptyTextStyle: this.state.error ? {color: "red"} : {},
+				emptyText: this.state.error ? this.state.error : 'No records',
 				selected: selection,
 				onSelectionChange: this.onSelectionChange,
 				key: 'data-grid'

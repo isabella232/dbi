@@ -22,9 +22,23 @@ var SQLEditor = React.createClass ({
 		xhr.onreadystatechange = function () {
 			if (xhr.readyState === 4) {
 
-				var results = JSON.parse (xhr.response);
+				var response = JSON.parse (xhr.response);
+
+				var status = response.status;
+
+				if (status === 'error') {
+					grid.setData ({columns: [], rows: [], loading: false, error: response.error});
+					return;
+				}
+
+				// TODO: another status must be success
 
 				//console.log (results);
+
+				// TODO: multigrid
+				// if you have multiple statements in your query,
+				// resultSet will contains every statement result
+				var results = response.results[0];
 
 				var columns = [],
 					rows    = [],
@@ -38,7 +52,7 @@ var SQLEditor = React.createClass ({
 					rows.push (row);
 				});
 
-				grid.setData ({columns: columns, rows: rows, loading: false});
+				grid.setData ({columns: columns, rows: rows, loading: false, error: null});
 
 			}
 		};
@@ -58,6 +72,8 @@ var SQLEditor = React.createClass ({
 		} else if (value === "all") {
 			sql = this.refs.cm.editor.getValue ();
 		}
+
+		console.log (value, sql);
 
 		// this is time to run some sql
 		this.runDBQuery (sql);

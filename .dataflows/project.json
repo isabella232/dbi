@@ -84,12 +84,27 @@
 						}, {
 							"$errback": "runQuery",
 							"$args": ["{$request.capture.0}", "{$request.body.fields.query.0}"],
-							"$set": "results"
+							"$important": true,
+							"$set": "results",
+							"$setOnFail": "error"
 						}],
 						"presenter": {
-							"type": "json",
-							"vars": "{$results}",
-							"verbose": true
+							"completed": {
+								"type": "json",
+								"vars": {
+									"status": "success",
+									"results": "{$results}"
+								},
+								"verbose": true
+							},
+							"failed": {
+								"type": "json",
+								"vars": {
+									"status": "error",
+									"message": "{$error}"
+								},
+								"verbose": true
+							}
 						}
 					}]
 				}]
