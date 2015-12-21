@@ -1,7 +1,7 @@
 DBI
 ---
 
-Tribute to Perl DBI by nodejs
+Database Interface
 
 
 
