@@ -3,6 +3,8 @@ DBI
 
 Database Interface
 
+Supports: SQLite, MySQL, Postgres, Microsoft SQL Server, Oracle Database.
+
 ![screenshot](https://github.com/apla/dbi/raw/master/www/screenshot.png)
 
 
