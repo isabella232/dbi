@@ -3,7 +3,7 @@ DBI
 
 Database Interface
 
-
+![screenshot](https://github.com/apla/dbi/raw/master/www/screenshot.png)
 
 
 ## links
